@@ -18,12 +18,12 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['movies', query, page],
-    queryFn: () => fetchMovies(query, page),
-    enabled: query.trim().length > 0,
-  });
-
+ const { data, isLoading, isError } = useQuery({
+  queryKey: ['movies', query, page],
+  queryFn: () => fetchMovies(query, page),
+  enabled: query.trim().length > 0,
+    placeholderData: (previousData) => previousData,
+});
   const movies = data?.results ?? [];
   const totalPages = data?.total_pages ?? 0;
 
@@ -53,7 +53,7 @@ export default function App() {
       {isError && <ErrorMessage />}
 
       {!isLoading && !isError && movies.length > 0 && (
-        <MovieGrid movies={movies} onSelect={setSelectedMovie} />
+        <MovieGrid movies={movies as Movie[]} onSelect={setSelectedMovie} />
       )}
 
       {!isLoading && !isError && query && movies.length === 0 && (
@@ -72,7 +72,7 @@ export default function App() {
           pageCount={totalPages}
           pageRangeDisplayed={5}
           marginPagesDisplayed={1}
-          onPageChange={({ selected }) => setPage(selected + 1)}
+          onPageChange={(event) => setPage(event.selected + 1)}
           forcePage={page - 1}
           containerClassName={css.pagination}
           activeClassName={css.active}
